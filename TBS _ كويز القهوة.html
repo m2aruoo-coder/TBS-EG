@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TBS | كويز القهوة</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;800&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf8f3;--ink:#22140d;--coffee:#4a2c1a;--soft:#f0e8dc;--line:#ddd0bd;--ok:#2f7d4f;--bad:#a52b2b;box-sizing:border-box}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#150d09;--ink:#f3e9dc;--coffee:#c79a72;--soft:#241711;--line:#3b281e}}
+:root[data-theme="dark"]{--bg:#150d09;--ink:#f3e9dc;--coffee:#c79a72;--soft:#241711;--line:#3b281e}
+*{box-sizing:border-box;margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Tajawal,Tahoma,sans-serif;min-height:100vh}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:3px solid var(--coffee);outline-offset:3px}
+.hero{min-height:100vh;display:grid;grid-template-rows:auto 1fr auto;color:#fff;background:radial-gradient(ellipse at 50% 30%,#7a4a2e 0,#3a2012 55%,#160b06 100%);padding:calc(22px + env(safe-area-inset-top,0px)) 5vw calc(4vh + env(safe-area-inset-bottom,0px))}
+.logo{font-family:Archivo,sans-serif;font-weight:800;letter-spacing:.3em;text-align:center;direction:ltr}
+.stage{display:grid;place-items:center;text-align:center;padding:4vh 0}
+.panel{width:min(640px,100%)}
+.big{position:absolute;inset:auto 0 3vh;text-align:center;font-family:Archivo,sans-serif;font-weight:800;font-size:clamp(7rem,34vw,26rem);line-height:.8;color:rgba(255,255,255,.07);pointer-events:none;direction:ltr}
+.stage,.panel{position:relative;z-index:1}
+h1{font-size:clamp(2rem,6vw,3.4rem);line-height:1.25;margin-bottom:12px}
+.sub{opacity:.8;margin-bottom:28px}
+.btn{background:#fff;color:#2b170d;border:0;border-radius:999px;padding:13px 38px;font-weight:700;font-size:1.05rem}
+.q{font-size:clamp(1.3rem,4vw,1.9rem);font-weight:700;margin:16px 0 22px;line-height:1.5}
+.meta{display:flex;justify-content:space-between;opacity:.85;font-size:.95rem}
+.bar{height:5px;background:rgba(255,255,255,.2);border-radius:9px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:#fff;width:100%;transition:width 1s linear}
+.opts{display:grid;gap:10px}
+.opt{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.35);border-radius:14px;padding:14px 18px;text-align:start;font-size:1.05rem;color:#fff;backdrop-filter:blur(6px)}
+.opt:hover:not(:disabled){background:rgba(255,255,255,.2)}
+.opt.ok{background:var(--ok);border-color:var(--ok)}
+.opt.no{background:var(--bad);border-color:var(--bad)}
+.code{display:inline-block;direction:ltr;font-family:Archivo,sans-serif;font-weight:800;font-size:2.2rem;letter-spacing:.2em;border:2px dashed #fff;border-radius:14px;padding:10px 26px;margin:10px 0 24px}
+.foot{text-align:center;font-size:.85rem;opacity:.6}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="logo">TBS</div>
+  <div class="stage"><div class="panel" id="p" aria-live="polite"></div></div>
+  <div class="big" aria-hidden="true">TBS</div>
+  <div class="foot">لكل زبون محاولة واحدة في كل زيارة</div>
+</section>
+<script>
+var Q=[
+["أكتر دولة في العالم بتنتج البن؟",["البرازيل","فيتنام","كولومبيا","إثيوبيا"],0],
+["إيه أشهر نوعين من البن؟",["عربيكا وروبوستا","موكا وليبريكا","لاتيه وإسبريسو","كونا وجيشا"],0],
+["أنهي نوع أعلى في نسبة الكافيين؟",["روبوستا","عربيكا","الاتنين زي بعض","الديكاف"],0],
+["الموطن الأصلي للقهوة؟",["إثيوبيا","البرازيل","تركيا","اليمن"],0],
+["الكابتشينو أساسه إيه؟",["إسبريسو وحليب مبخّر ورغوة","إسبريسو وماء ساخن","قهوة مثلجة وكريمة","إسبريسو وشوكولاتة فقط"],0],
+["الأمريكانو بيتعمل من؟",["إسبريسو وماء ساخن","إسبريسو وحليب","قهوة تركي وحليب","بن مثلّج"],0],
+["اللاتيه بيتميز بإيه؟",["كمية حليب كبيرة مع الإسبريسو","كمية كريمة كبيرة","من غير حليب","إسبريسو مركّز جدًا"],0],
+["الموكا فيها إيه زيادة عن اللاتيه؟",["شوكولاتة","كراميل","قرفة","نعناع"],0],
+["كلمة ماكياتو في الإيطالي معناها؟",["مبقّع أو ملطّخ","ساخن","حلو","مركّز"],0],
+["الأفوغاتو عبارة عن؟",["إسبريسو فوق آيس كريم فانيليا","قهوة بالحليب المثلّج","إسبريسو بالكراميل","قهوة بالقشطة الساخنة"],0],
+["الكورتادو فيه؟",["إسبريسو وكمية صغيرة من الحليب","حليب بس","إسبريسو وكريمة","قهوة وماء"],0],
+["الريستريتو مقارنة بالإسبريسو العادي؟",["أقصر وأكثف","أطول وأخف","نفس الشيء","بارد"],0],
+["الطبقة الذهبية فوق الإسبريسو اسمها؟",["كريما","فوم","بلوم","كراست"],0],
+["درجة حرارة الماء المناسبة لتحضير القهوة تقريبًا؟",["من 90 إلى 96 مئوية","من 50 إلى 60","100 بالظبط وبيغلي","من 20 إلى 30"],0],
+["الكولد برو بيتحضّر إزاي؟",["نقع في ماء بارد لساعات طويلة","غلي سريع","إسبريسو وتلج فوقه","ماء ساخن وبعدين تلج"],0],
+["الطحنة المناسبة للفرنش برس؟",["خشنة","ناعمة جدًا","ناعمة كالبودرة","مفيش فرق"],0],
+["الطحنة المناسبة للقهوة التركي؟",["ناعمة جدًا كالبودرة","خشنة","متوسطة","حبوب كاملة"],0],
+["الطحنة المناسبة للإسبريسو؟",["ناعمة","خشنة جدًا","حبوب كاملة","مفيش فرق"],0],
+["التحميص الفاتح بيحافظ على؟",["حموضة ونكهات الحبة الأصلية","طعم محروق قوي","كافيين أقل بكتير","لون أسود"],0],
+["القهوة الديكاف معناها؟",["منزوعة معظم الكافيين","من غير طعم","محمّصة أكتر","مضاف لها سكر"],0],
+["أنسب مكان لتخزين البن؟",["علبة محكمة بعيدًا عن الضوء والحرارة","كيس مفتوح على الرخامة","جنب الفرن","في الشمس"],0],
+["الأفضل تستخدم البن بعد التحميص خلال؟",["أسابيع قليلة","سنة","خمس سنين","ساعة واحدة"],0],
+["النسبة الشائعة للتحضير بالتنقيط؟",["جرام بن لكل 15 إلى 17 مل ماء","جرام بن لكل 1 مل ماء","جرام بن لكل 100 مل ماء","نص كيلو لكل لتر"],0],
+["V60 اتسمى كده بسبب؟",["شكله على حرف V وزاويته 60 درجة","اسم مخترعه","سنة اختراعه","وزنه"],0],
+["القهوة المختصة (Specialty) بتاخد أكتر من كام نقطة من 100؟",["80","20","50","10"],0],
+["القهوة التركي بتتحضّر في؟",["الركوة أو الكنكة","ماكينة إسبريسو","الفرنش برس","الأيروبريس"],0],
+["الفرنش برس بيشتغل بطريقة؟",["نقع ثم ضغط المصفاة","ضغط بخار عالي","تنقيط ورقي","تبريد"],0],
+["ثمرة البن الناضجة بتتسمى؟",["كرز البن","عنب البن","تمر البن","توت البن"],0],
+["لون ثمرة البن لما تنضج غالبًا؟",["أحمر","أزرق","أبيض","بنفسجي"],0],
+["الفلات وايت تقريبًا بيتميز بإيه؟",["قهوة قوية مع حليب مخملي وقليل الرغوة","رغوة كتيرة جدًا","من غير حليب","بارد دايمًا"],0]
+];
+var T=15,qs,i,ok,t,tm,done,p=document.getElementById("p");
+function sh(a){a=a.slice();for(var k=a.length-1;k>0;k--){var j=Math.floor(Math.random()*(k+1)),x=a[k];a[k]=a[j];a[j]=x}return a}
+function start(){p.innerHTML='<h1>جاوب صح واكسب خصم 20%</h1><p class="sub">ثلاث أسئلة عن القهوة، ولكل سؤال 15 ثانية.</p><button class="btn" id="go">ابدأ</button>';document.getElementById("go").onclick=function(){qs=sh(Q).slice(0,3);i=0;ok=0;show()}}
+function show(){
+  var q=qs[i],o=sh(q[1].map(function(x,k){return{x:x,r:k==q[2]}}));done=false;t=T;
+  p.innerHTML='<div class="meta"><span>السؤال '+(i+1)+'</span><span id="s">'+T+'</span></div><div class="bar"><i id="b"></i></div><div class="q">'+q[0]+'</div><div class="opts">'+o.map(function(a,k){return '<button class="opt" data-r="'+(a.r?1:0)+'">'+a.x+'</button>'}).join("")+'</div>';
+  p.querySelector(".opts").onclick=function(e){if(!done&&e.target.dataset.r!==undefined)fin(e.target)};
+  tm=setInterval(function(){t--;document.getElementById("s").textContent=t;document.getElementById("b").style.width=(t/T*100)+"%";if(t<=0)fin(null)},1000);
+}
+function fin(btn){
+  done=true;clearInterval(tm);
+  var all=p.querySelectorAll(".opt");all.forEach(function(b){b.disabled=true;if(b.dataset.r=="1")b.classList.add("ok")});
+  var good=btn&&btn.dataset.r=="1";if(btn&&!good)btn.classList.add("no");
+  if(good)ok++;
+  setTimeout(function(){if(!good)return end();i++;i<3?show():end()},1100);
+}
+function end(){
+  if(ok==3){p.innerHTML='<h1>مبروك! جاوبت الكل صح</h1><p class="sub">ده كود خصم 20% ليك:</p><div class="code">TBS20</div><br><button class="btn" id="cp">انسخ الكود</button>';document.getElementById("cp").onclick=function(){try{navigator.clipboard.writeText("TBS20")}catch(e){}this.textContent="تم النسخ"}}
+  else{p.innerHTML='<h1>قربت!</h1><p class="sub">مجاوبتش الأسئلة كلها صح المرة دي. جرّب تاني بأسئلة جديدة.</p><button class="btn" id="go">حاول تاني</button>';document.getElementById("go").onclick=function(){qs=sh(Q).slice(0,3);i=0;ok=0;show()}}
+}
+start();
+</script>
+</body>
+</html>
